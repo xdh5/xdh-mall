@@ -9,7 +9,7 @@ import '@/assets/style/global.css';
 
 import Vue from 'vue';
 import Footer from '@/components/Footer'
-import { Lazyload,  } from 'vant';
+import { Lazyload, Image  } from 'vant';
 import { Loading } from 'vant';
 
 Vue.use(Lazyload,{
@@ -17,6 +17,7 @@ Vue.use(Lazyload,{
     error: require('@/assets/images/no-image.jpg')
 });
 Vue.use(Loading);
+Vue.use(Image);
 
 export default {
     components:{

@@ -35,7 +35,7 @@
                 <div class="price">￥{{value.currentPrice}}</div>
             </div> 
         </li>
-        <van-loading class="tipImage" type="spinner" color="#1989fa" v-if="loading"/>
+        <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
         </ul>
     </div>
     <div class="information" v-if="currentData.length === 0 && totalData.length>0">
@@ -49,14 +49,13 @@
 </template>
 
 <script>
-import { Swipe, SwipeItem, Image } from 'vant';
+import { Swipe, SwipeItem } from 'vant';
 import { InfiniteScroll } from 'mint-ui';
 
 export default {
     components: {
         [Swipe.name]: Swipe,
         [SwipeItem.name]: SwipeItem,
-        [Image.name]: Image
     },
     directives: {
         InfiniteScroll
@@ -75,7 +74,7 @@ export default {
         getList () {
             if(this.currentData.length>0){
                 this.loading = true;
-                this.$axios.get('index/mayLike', {params:{page:this.page, limit:this.limit}})
+                this.$axios.get('/index/mayLike', {params:{page:this.page, limit:this.limit}})
                 .then(res => {
                     this.currentData = res.data
                     if(this.currentData.length>0){
@@ -90,7 +89,7 @@ export default {
             }
         },
         getCarousel () {  
-            this.$axios.get('index/carousel')
+            this.$axios.get('/index/carousel')
             .then(res => {
                 this.swipeImages = res.data
             })
@@ -169,9 +168,7 @@ export default {
 }
 .tipImage{
     text-align: center;
-    img{
-        margin: 30px 0;
-    }
+    margin: 20px 0;
 }
 .information{
     font-size: 12px;
