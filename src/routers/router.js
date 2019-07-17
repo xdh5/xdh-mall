@@ -10,23 +10,30 @@ const routes = [
     },
     {
         name: 'index',
-        component: () => import('./view/index'),
+        component: () => import('@/pages/index'),
         meta: {
             title: '蛋黄商城-首页'
         }
     },
     {
-        name: 'user',
-        component: () => import('./view/user'),
+        name: 'goods',
+        component: () => import('@/pages/goods'),
         meta: {
-            title: '会员中心'
+            title: '蛋黄商城-商品'
         }
     },
     {
         name: 'cart',
-        component: () => import('./view/cart'),
+        component: () => import('@/pages/cart'),
         meta: {
-            title: '购物车'
+            title: '蛋黄商城-购物车'
+        }
+    },
+    {
+        name: 'user',
+        component: () => import('@/pages/user'),
+        meta: {
+            title: '蛋黄商城-会员中心'
         }
     }
 ];

@@ -1,22 +1,43 @@
 const autoprefixer = require('autoprefixer');
 const pxtoviewport = require('postcss-px-to-viewport');
+const path = require('path');
+
+function resolve(dir) {
+    return path.join(__dirname, dir)
+}
 
 module.exports = {
-  outputDir: 'docs',
-  publicPath: process.env.NODE_ENV === 'production' ? '/xdh-mall/' : '/',
-  css: {
-    loaderOptions: {
-      postcss: {
-        plugins: [
-          autoprefixer(),
-          pxtoviewport({
-            viewportWidth: 375,
-            // 该项仅在使用 Circle 组件时需要
-            // 原因参见 https://github.com/youzan/vant/issues/1948
-            selectorBlackList: ['van-circle__layer']
-          })
-        ]
-      }
+    outputDir: 'dist',
+    // publicPath: process.env.NODE_ENV === 'production' ? '/xdh-mall/' : '/',
+    publicPath: '/',
+    devServer: {
+        proxy: 'https://www.easy-mock.com/mock/5d26d02f62e721147f60ad0a/v1',
+        // proxy: {
+        //     //配置自动启动浏览器
+        //     "/v1/*": {
+        //         target: "https://www.easy-mock.com/project/5d26d02f62e721147f60ad0a",
+        //         changeOrigin: true,
+        //         // ws: true,//websocket支持
+        //         secure: false
+        //     }
+        // }
+    },
+    lintOnSave: true,
+    chainWebpack: (config) => {
+        config.resolve.alias
+            .set('@', resolve('src'))
+    },
+    css: {
+        loaderOptions: {
+            postcss: {
+                plugins: [
+                    autoprefixer(),
+                    pxtoviewport({
+                        viewportWidth: 375,
+                        selectorBlackList: ['van-circle__layer']
+                    })
+                ]
+            }
+        }
     }
-  }
 };

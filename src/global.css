@@ -1,0 +1,73 @@
+body, dd, dl, fieldset, form, h1, h2, h3, h4, h5, h6, input, legend, ol, p, select, td, textarea, th, ul {
+    margin: 0;
+    padding: 0
+}
+body {
+    font: 12px SimSun, "Arial Narrow", HELVETICA;
+    -webkit-text-size-adjust: 100%
+}
+a {
+    text-decoration: none
+}
+a:hover {
+    color: #007acc;
+    text-decoration: underline
+}
+em {
+    font-style: normal
+}
+li {
+    list-style: none
+}
+img {
+    border: 0;
+    vertical-align: middle
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+button{
+    background-color: inherit
+}
+p {
+    word-wrap: break-word
+}
+.left {
+    float: left
+}
+.right {
+    float: right
+}
+.overflow {
+    overflow: hidden
+}
+.hide {
+    display: none
+}
+.block {
+    display: block
+}
+.inline {
+    display: inline
+}
+label, button {
+    cursor: pointer
+}
+.clearfix:after {
+    content: '';
+    display: block;
+    height: 0;
+    clear: both
+}
+.clearfix {
+    zoom: 1
+}
+.clear {
+    clear: both;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    visibility: hidden;
+    overflow: hidden
+}

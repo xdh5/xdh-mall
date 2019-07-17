@@ -1,9 +1,11 @@
 import Vue from 'vue';
 import App from './App';
-import { router } from './router';
+import { router } from './routers/router';
+import api from './api/api'
 
 new Vue({
-  router,
-  el: '#app',
-  render: h => h(App)
+    router,
+    api,
+    el: '#app',
+    render: h => h(App)
 });
