@@ -9,7 +9,7 @@ function resolve(dir) {
 module.exports = {
     outputDir: 'dist',
     // publicPath: process.env.NODE_ENV === 'production' ? '/xdh-mall/' : '/',
-    publicPath: '/',
+    publicPath: './',
     devServer: {
         proxy: 'https://www.easy-mock.com/mock/5d26d02f62e721147f60ad0a/v1',
         // proxy: {

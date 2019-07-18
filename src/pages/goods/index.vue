@@ -1,43 +1,43 @@
 <template>
-    <div class="wrapper">
-        <van-search 
-            placeholder="请输入搜索关键词"
-            v-model="keyWord"
-            show-action
-            @search="onSearch"
-            @cancel="onCancel"
-        />
-        <van-sidebar v-model="activeKey" @change="initializeItem">
-            <van-sidebar-item title="全部" />
-            <van-sidebar-item title="潮流服饰" />
-            <van-sidebar-item title="食品酒水" />
-            <van-sidebar-item title="家居用品" />
-            <van-sidebar-item title="出行户外" />
-        </van-sidebar>
-        <div class="good-wrapper">
-            <div class="tipImage" v-if="totalData.length === 0 && !loading">
-                <img src="@/assets/images/empty.png" alt="暂无数据">
-            </div>
-            <van-grid 
-            :column-num="2"
-            v-infinite-scroll="getList"
-            infinite-scroll-disabled="forbidInfinite"
-            infinite-scroll-distance="10"
-            >
-                <van-grid-item v-for="(value, key) in totalData" :key="key">
-                    <van-image
-                    lazy-load
-                    :src="value.image"
-                    >
-                        <template v-slot:loading>加载中</template>
-                        <template v-slot:error>加载失败</template>
-                    </van-image>
-                    <span>{{value.name}}</span>
-                </van-grid-item>
-            </van-grid>
-            <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
+<div class="wrapper">
+    <van-search 
+        placeholder="请输入搜索关键词"
+        v-model="keyWord"
+        show-action
+        @search="onSearch"
+        @cancel="onCancel"
+    />
+    <van-sidebar v-model="activeKey" @change="initializeItem">
+        <van-sidebar-item title="全部" />
+        <van-sidebar-item title="潮流服饰" />
+        <van-sidebar-item title="食品酒水" />
+        <van-sidebar-item title="家居用品" />
+        <van-sidebar-item title="出行户外" />
+    </van-sidebar>
+    <div class="good-wrapper">
+        <div class="tipImage" v-if="totalData.length === 0 && !loading">
+            <img src="@/assets/images/empty.png" alt="暂无数据">
         </div>
+        <van-grid 
+        :column-num="2"
+        v-infinite-scroll="getList"
+        infinite-scroll-disabled="forbidInfinite"
+        infinite-scroll-distance="10"
+        >
+            <van-grid-item v-for="(value, key) in totalData" :key="key">
+                <van-image
+                lazy-load
+                :src="value.image"
+                >
+                    <template v-slot:loading>加载中</template>
+                    <template v-slot:error>加载失败</template>
+                </van-image>
+                <span>{{value.name}}</span>
+            </van-grid-item>
+        </van-grid>
+        <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
     </div>
+</div>
 </template>
 
 <script>
