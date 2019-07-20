@@ -1,27 +1,25 @@
 <template>
   <div id="app">
-    <router-view class="main"></router-view>
-    <Footer></Footer>
+    <router-view name="main" class="main"></router-view>
+    <router-view name="footer"></router-view>
   </div>
 </template>
 <script>
 import '@/assets/style/global.css';
 
 import Vue from 'vue';
-import Footer from '@/components/Footer'
-import { Lazyload, Image  } from 'vant';
-import { Loading } from 'vant';
+import { Lazyload, Image, Loading, Icon  } from 'vant';
 
 Vue.use(Lazyload,{
     loading: require('@/assets/images/no-image.jpg'),
     error: require('@/assets/images/no-image.jpg')
-});
-Vue.use(Loading);
-Vue.use(Image);
+})
+.use(Loading)
+.use(Image)
+.use(Icon)
 
 export default {
     components:{
-        Footer
     }
 }
 </script>
@@ -32,7 +30,7 @@ body {
   background-color: #f8f8f8;
   -webkit-font-smoothing: antialiased;
 }
-.main{
+/* .main{
     margin-bottom: 50px
-}
+} */
 </style>

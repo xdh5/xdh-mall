@@ -8,10 +8,10 @@ function resolve(dir) {
 
 module.exports = {
     outputDir: 'dist',
-    // publicPath: process.env.NODE_ENV === 'production' ? '/xdh-mall/' : '/',
+    // publicPath: process.env.NODE_ENV === 'production' ? 'https://leancloud.cn:443/1.1/' : '/',
     publicPath: './',
     devServer: {
-        proxy: 'https://www.easy-mock.com/mock/5d26d02f62e721147f60ad0a/v1',
+        // proxy: 'https://leancloud.cn:443/1.1',
         // proxy: {
         //     //配置自动启动浏览器
         //     "/v1/*": {

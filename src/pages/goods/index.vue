@@ -7,7 +7,7 @@
         @search="onSearch"
         @cancel="onCancel"
     />
-    <van-sidebar v-model="activeKey" @change="initializeItem">
+    <van-sidebar v-model="activeKey" @change="changeSide">
         <van-sidebar-item title="全部" />
         <van-sidebar-item title="潮流服饰" />
         <van-sidebar-item title="食品酒水" />
@@ -25,14 +25,17 @@
         infinite-scroll-distance="10"
         >
             <van-grid-item v-for="(value, key) in totalData" :key="key">
+                <router-link :to="{name: 'detail', params: {id:value.objectId}}">
                 <van-image
                 lazy-load
-                :src="value.image"
+                fit="cover"
+                :src="value.picture.url"
                 >
                     <template v-slot:loading>加载中</template>
                     <template v-slot:error>加载失败</template>
                 </van-image>
                 <span>{{value.name}}</span>
+                </router-link>
             </van-grid-item>
         </van-grid>
         <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
@@ -58,61 +61,78 @@ export default {
     data() {
         return {
             loading: false,
+            forbidInfinite: false, //禁止无限滚动
+
             activeKey: 0 ,  // 0: 全部, 1: 衣, 2: 食, 3: 住, 4: 行
             totalData: [],
-            currentData: [{name: '', image: ''}],
+            currentData: [undefined],
             page: 1,
-            limit: 4,
-            forbidInfinite: false, //禁止无限滚动
+            
             keyWord: ''
         }
     },
     methods: {
-        getList () {
-            if(this.currentData.length>0){
-                this.loading = true;
-                this.forbidInfinite = true
-                this.$axios.get('/goods/showGoods', {params:{page:this.page, limit:this.limit, type:this.activeKey}})
-                .then(res => {
-                    this.currentData = res.data
-                    if(this.currentData.length>0){
-                        this.totalData = this.totalData.concat(this.currentData)
-                        this.page += 1
-                    }
-                    this.loading = false
-                    this.forbidInfinite = false
-                })
-                .catch(err=>{
-                    console.log(err)
-                })
-            }
-        },
         initializeItem () {
             this.totalData = []
-            this.currentData = [{name: '', image: ''}]
+            this.currentData = [undefined]
             this.page = 1
-            this.keyWord = ''
-            this.getList()
-        },
-        onSearch () {
-            this.totalData = []
-            this.currentData = [{name: '', image: ''}]
-            this.page = 1
-            this.loading = true
+            // this.keyWord = ''
+        },  //  初始化数据
+
+        getList () {
+            this.loading = true;
             this.forbidInfinite = true
-            this.$axios.get('/goods/search', {params:{type: this.activeKey, key: this.keyWord}})
+            this.$axios.get(
+                '/classes/Goods',
+                {params: {
+                    keys: 'name,picture',
+                    limit: 4,
+                    skip: (this.page-1)*4,
+                    where: {'type': this.activeKey ===0 ?{"$in":[1,2,3,4]} : this.activeKey}
+                }}
+            )
             .then(res => {
-                this.totalData = res.data
+                this.currentData = res.results
+                if(this.currentData.length>0){
+                    this.totalData = this.totalData.concat(this.currentData)
+                    this.page += 1
+                    this.forbidInfinite = false
+                }
                 this.loading = false
             })
             .catch(err=>{
                 console.log(err)
+                this.loading = false
+            })
+        },
+        changeSide () {
+            this.initializeItem()
+            this.getList()
+        },
+        onSearch () {
+            this.initializeItem()
+            this.forbidInfinite = true
+            this.loading = true
+            this.$axios.get(
+                '/classes/Goods',
+                {params: {
+                    keys: 'name,picture',
+                    where: {
+                        'type': this.activeKey ===0 ?{"$in":[1,2,3,4]} : this.activeKey,
+                        'name': {"$regex":`.*${this.keyWord}.*`}
+                    }
+                }}
+            )
+            .then(res => {
+                this.totalData = res.results
+                this.loading = false
+            })
+            .catch(err=>{
+                console.log(err)
+                this.loading = false
             })
         },
         onCancel(){
-            if (this.forbidInfinite = true) {
-                this.initializeItem()
-            }
             this.keyWord = ''
         }
     },
@@ -142,6 +162,10 @@ export default {
 .good-wrapper{
     margin: 54px 0 0 85px;
     .van-grid-item{
+        img{
+            width: 120px;
+            height: 120px;
+        }
         span{
             color: #666;
             font-family: "Microsoft YaHei";
@@ -150,6 +174,8 @@ export default {
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            display: inline-block;
+            width: 120px;
         }
     }
 }

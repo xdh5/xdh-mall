@@ -1,8 +1,8 @@
 <template>
 <div class="wrapper">
     <van-swipe :autoplay="4000" indicator-color="white">
-        <van-swipe-item  v-for="(value,key) in swipeImages" :key="key">
-            <img v-lazy="value.image">  
+        <van-swipe-item  v-for="(value,key) in 3" :key="key">
+            <img src="@/assets/images/banner1.jpg">
         </van-swipe-item>
     </van-swipe>
     <div class="line-block line-block-gray">
@@ -17,26 +17,28 @@
         <ul
         class="clearfix"
         v-infinite-scroll="getList"
-        infinite-scroll-disabled="loading"
+        infinite-scroll-disabled="forbidInfinite"
         infinite-scroll-distance="10"
         >
         <li class="goods-item" v-for="(value,key) in totalData" :key="key">
             <div class="img-box">
-            <van-image
-            lazy-load
-            :src="value.image"
-            >
-                <template v-slot:loading>加载中</template>
-                <template v-slot:error>加载失败</template>
-            </van-image>
+                <router-link :to="{name: 'detail', params: {id:value.objectId}}">
+                <van-image
+                fit="cover"
+                lazy-load
+                :src="value.picture.url"
+                >
+                    <template v-slot:loading>加载中</template>
+                </van-image>
+                </router-link>
             </div>
             <div class="detail">
                 <div class="title">{{value.name}}</div>
-                <div class="price">￥{{value.currentPrice}}</div>
+                <div class="price">￥{{value.price}}</div>
             </div> 
         </li>
-        <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
         </ul>
+        <van-loading class="tipImage" type="spinner" color="#1989fa" v-show="loading"/>
     </div>
     <div class="information" v-if="currentData.length === 0 && totalData.length>0">
         <dl>
@@ -63,44 +65,42 @@ export default {
     data() {
         return {
             loading: false,
-            swipeImages:[],
             totalData: [],
-            currentData: [{name: '', currentPrice: '', image: ''}],
+            currentData: [undefined],
             page: 1,
-            limit: 4
+            forbidInfinite: false, //禁止无限滚动
         }
     },
     methods: {
         getList () {
-            if(this.currentData.length>0){
-                this.loading = true;
-                this.$axios.get('/index/mayLike', {params:{page:this.page, limit:this.limit}})
-                .then(res => {
-                    this.currentData = res.data
-                    if(this.currentData.length>0){
-                        this.totalData = this.totalData.concat(this.currentData)
-                        this.page += 1
-                    }
-                    this.loading = false
-                })
-                .catch(err=>{
-                    console.log(err)
-                })
-            }
-        },
-        getCarousel () {  
-            this.$axios.get('/index/carousel')
+            this.loading = true;
+            this.forbidInfinite = true
+            this.$axios.get(
+                '/classes/Goods',
+                {params: {
+                    keys: 'name,price,picture',
+                    order: '-saleVolume',
+                    limit: 4,
+                    skip: (this.page-1)*4,
+                }}
+            )
             .then(res => {
-                this.swipeImages = res.data
+                this.currentData = res.results
+                if(this.currentData.length>0){
+                    this.totalData = this.totalData.concat(this.currentData)
+                    this.page += 1
+                    this.forbidInfinite = false
+                }
+                this.loading = false
             })
             .catch(err=>{
                 console.log(err)
+                this.loading = false
             })
         }
     },
     created () {
         this.getList()
-        this.getCarousel ()
     }
 }
 </script>
@@ -141,11 +141,12 @@ export default {
     .goods-item{
         box-sizing: border-box;
         width: 50%;
-        padding:0 5px;
+        padding: 0 5px;
         float: left;
-        margin:5px 0;
-        img{
-            width: 100%;
+        margin: 5px 0;
+        .van-image{
+            width: 177px;
+            height: 177px;
         }
         .detail{
             background: white;

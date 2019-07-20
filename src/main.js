@@ -1,11 +1,15 @@
 import Vue from 'vue';
 import App from './App';
 import { router } from './routers/router';
-import api from './api/api'
+import { axios } from './api/index';
+import store from './store/index'
+
+Vue.prototype.$axios = axios
 
 new Vue({
     router,
-    api,
+    axios,
+    store,
     el: '#app',
     render: h => h(App)
 });
