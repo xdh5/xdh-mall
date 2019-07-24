@@ -23,7 +23,7 @@ export default {
     },
     methods: {
         goPage (index) {
-            this.$router.push(`${index}`)
+            this.$router.push(`/${index}`)
         }
     }
 }

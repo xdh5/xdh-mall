@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import App from './App';
-import { router } from './routers/router';
 import { axios } from './api/index';
 import store from './store/index'
+import { router } from './routers/router';
 
 Vue.prototype.$axios = axios
 

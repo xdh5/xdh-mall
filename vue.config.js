@@ -8,8 +8,8 @@ function resolve(dir) {
 
 module.exports = {
     outputDir: 'dist',
-    // publicPath: process.env.NODE_ENV === 'production' ? 'https://leancloud.cn:443/1.1/' : '/',
-    publicPath: './',
+    publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+    // publicPath: './',
     devServer: {
         // proxy: 'https://leancloud.cn:443/1.1',
         // proxy: {

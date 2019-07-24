@@ -1,114 +1,144 @@
 <template>
 <div class="wrapper">
     <header class="clearfix">
-        <div class="left">
+        <GoBack></GoBack>
+        <div class="left title">
             <h1>购物车</h1>
             <p>共<span> {{goods.length}} </span>件</p>
         </div>
-        <button class="right edit">编辑</button>
     </header>
     <van-checkbox-group class="card-goods" v-model="checkedGoods">
-        <van-checkbox
+        <van-swipe-cell
             class="card-goods__item"
-            v-for="item in goods"
-            :key="item.id"
-            :name="item.id"
+            v-for="(value, key) in goods"
+            :key="key"
         >
-        <van-swipe-cell>
+            <van-checkbox
+                :name="value"
+            />
             <van-card
-            :title="item.title"
-            :desc="item.desc"
-            :price="formatPrice(item.price)"
-            :thumb="item.thumb"
-            :num="item.num">
-            <div slot="num">
-                <van-stepper v-model="value" />
-            </div>
+            :title="value.name"
+            :price="value.price"
+            :thumb="value.url"
+            :num="value.quantity">
+            <template slot="num">
+                <van-stepper v-model="value.quantity" prop="value" @change="changeQuantity(value, $event)"/>
+            </template>
             </van-card>
             <template slot="right">
-                <van-button square type="danger" text="删除" />
+                <van-button square type="danger" prop="value" text="删除" @click="deleteGood(value)"/>
             </template>
         </van-swipe-cell>
-        </van-checkbox>
     </van-checkbox-group>
     <van-submit-bar
     :price="totalPrice"
     :disabled="!checkedGoods.length"
     :button-text="submitBarText"
     @submit="onSubmit">
-    <van-checkbox class="all-checked">全选</van-checkbox>
+    <van-checkbox class="all-checked" @click="allChecked" v-model="ifAllChecked">全选</van-checkbox>
     </van-submit-bar>
 </div>
 </template>
 
 <script>
 import { Card, Checkbox, CheckboxGroup, SubmitBar, Stepper, SwipeCell, Button } from 'vant';
+import GoBack from '@/components/GoBack'
 
 export default {
-  components: {
-    [Card.name]: Card,
-    [Checkbox.name]: Checkbox,
-    [CheckboxGroup.name]: CheckboxGroup,
-    [SubmitBar.name]: SubmitBar,
-    [Stepper.name]: Stepper,
-    [SwipeCell.name]: SwipeCell,
-    [Button.name]: Button
-  },
-
-  data() {
-    return {
-      checkedGoods: [],
-      goods: [{
-        id: '1',
-        title: '进口香蕉',
-        desc: '约250g，2根',
-        price: 200,
-        num: 1,
-        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/2f9a36046449dafb8608e99990b3c205.jpeg'
-      }, {
-        id: '2',
-        title: '陕西蜜梨',
-        desc: '约600g',
-        price: 690,
-        num: 1,
-        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/f6aabd6ac5521195e01e8e89ee9fc63f.jpeg'
-      }, {
-        id: '3',
-        title: '美国伽力果',
-        desc: '约680g/3个',
-        price: 2680,
-        num: 1,
-        thumb: 'https://img.yzcdn.cn/public_files/2017/10/24/320454216bbe9e25c7651e1fa51b31fd.jpeg'
-      }]
-    };
-  },
-
-  computed: {
-    submitBarText() {
-      const count = this.checkedGoods.length;
-      return '结算' + (count ? `(${count})` : '');
+    components: {
+        [Card.name]: Card,
+        [Checkbox.name]: Checkbox,
+        [CheckboxGroup.name]: CheckboxGroup,
+        [SubmitBar.name]: SubmitBar,
+        [Stepper.name]: Stepper,
+        [SwipeCell.name]: SwipeCell,
+        [Button.name]: Button,
+        GoBack
     },
-
-    totalPrice() {
-      return this.goods.reduce((total, item) => total + (this.checkedGoods.indexOf(item.id) !== -1 ? item.price : 0), 0);
-    }
-  },
-
-  methods: {
-    formatPrice(price) {
-      return (price / 100).toFixed(2);
+    data() {
+        return {
+            checkedGoods: [],
+            goods: [],
+            number: 1,
+            ifAllChecked: false
+        }
     },
-
-    onSubmit() {
+    computed: {
+        submitBarText() {
+            const count = this.checkedGoods.length;
+            return '结算' + (count ? `(${count})` : '');
+        },
+        totalPrice () {
+            let totol = 0
+            this.checkedGoods.forEach(element => {
+                totol += element.price * element.quantity
+            })
+            return totol*100
+        }
+    },
+    methods: {
+        getList () {
+            this.$axios.get(
+                '/classes/cart',
+                {params: {
+                    where: {'username': localStorage.getItem('username')}
+                }}
+            )
+            .then(res => {
+                this.goods = res.results
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        changeQuantity(value, quantity){
+            this.$axios.put(
+                `/classes/cart/${value.objectId}`,
+                {
+                    quantity: quantity
+                }
+            )
+            .then(res => {
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        deleteGood (value) {
+            this.$axios.delete(
+                `/classes/cart/${value.objectId}`
+            )
+            .then(res => {
+                this.getList()
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        allChecked(){
+            this.checkedGoods = this.goods.length === this.checkedGoods.length ? [] : this.goods
+        },
+        onSubmit() {
+        }
+    },
+    created () {
+        this.getList()
+    },
+    watch: {
+        checkedGoods: function (val) {
+            this.ifAllChecked = this.goods.length === this.checkedGoods.length ? true : false
+        }
     }
-  }
-};
+}
 </script>
 
 <style lang="less" scoped>
 header{
     padding: 10px;
     background: white;
+    .title{
+        margin-left: 30px;
+    }
     h1{
         color: #1989fa;
         font-size: 20px;
@@ -132,6 +162,13 @@ header{
     &__item{
         position: relative;
         background-color: #fafafa;
+        .van-card__header{
+            margin-left: 20px
+        }
+        .van-card__title{
+            width: 115px;
+            margin-bottom: 10px;
+        }
         .van-checkbox__label{
             width: 100%  !important;
             height: auto; // temp
@@ -149,6 +186,11 @@ header{
     .van-swipe-cell{
         .van-button{
             height: 100px;
+        }
+    }
+    /deep/.van-card__thumb{
+        img{
+            object-fit:cover!important
         }
     }
 }

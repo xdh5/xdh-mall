@@ -5,11 +5,7 @@
             <img src="@/assets/images/banner1.jpg">
         </van-swipe-item>
     </van-swipe>
-    <div class="line-block line-block-gray">
-        <div class="lineblock-title">
-            <span class="lineblock-font">最热商品推荐</span>
-        </div>
-    </div>
+    <van-divider>猜你喜欢</van-divider>
     <div class="may-like">
         <div class="tipImage" v-if="totalData.length === 0 && !loading">
             <img src="@/assets/images/empty.png" alt="暂无数据">
@@ -51,13 +47,14 @@
 </template>
 
 <script>
-import { Swipe, SwipeItem } from 'vant';
+import { Swipe, SwipeItem, Divider } from 'vant';
 import { InfiniteScroll } from 'mint-ui';
 
 export default {
     components: {
         [Swipe.name]: Swipe,
         [SwipeItem.name]: SwipeItem,
+        [Divider.name]: Divider
     },
     directives: {
         InfiniteScroll
@@ -111,30 +108,6 @@ export default {
     img{
         width: 100%;
         height: 100%;
-    }
-}
-.line-block{
-    margin:15px 0;
-    &:before {
-        content: "";
-        display: block;
-        margin: 15px
-    }
-    .lineblock-title {
-        display: block;
-        text-align: center;
-        margin-top: -22px;
-        line-height: 14px
-    }
-    &.line-block-gray{
-        &:before {
-            border-top: 1px solid #eee
-        }
-        .lineblock-font {
-            font-size:14px;
-            color: #999;
-            background-color: #f8f8f8
-        }
     }
 }
 .may-like{

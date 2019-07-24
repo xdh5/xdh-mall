@@ -1,8 +1,13 @@
 <template>
 <div class="detail">
+    <GoBack></GoBack>
     <van-swipe class="goods-swipe" :autoplay="4000">
         <van-swipe-item v-for="(value,key) in 3" :key="key">
-            <img :src="goods.picture.url" >
+            <van-image
+            fit="cover"
+            :src="goods.picture.url"
+            >
+            </van-image>
         </van-swipe-item>
     </van-swipe>
     <van-cell-group>
@@ -34,7 +39,7 @@
         <van-goods-action-icon icon="cart-o" @click="$router.push('/cart')">
             购物车
         </van-goods-action-icon>
-        <van-goods-action-button type="warning" @click="sorry">
+        <van-goods-action-button type="warning" @click="changeCart">
             加入购物车
         </van-goods-action-button>
         <van-goods-action-button type="danger" @click="sorry">
@@ -46,6 +51,7 @@
 
 <script>
 import { Tag, Col, Cell, CellGroup, Swipe,  Toast, SwipeItem, GoodsAction, GoodsActionIcon, GoodsActionButton } from 'vant';
+import GoBack from '@/components/GoBack'
 
 export default {
     components: {
@@ -57,11 +63,13 @@ export default {
         [SwipeItem.name]: SwipeItem,
         [GoodsAction.name]: GoodsAction,
         [GoodsActionIcon.name]: GoodsActionIcon,
-        [GoodsActionButton.name]: GoodsActionButton
+        [GoodsActionButton.name]: GoodsActionButton,
+        GoBack
     },
     data() {
         return {
-            goods: {picture:{}}
+            goods: {picture:{}},
+            cartInfo: {}
         }
     },
     methods: {
@@ -71,13 +79,77 @@ export default {
             )
             .then(res => {
                 this.goods = res
+                this.ifInCart()
             })
             .catch(err=>{
                 console.log(err)
             })
         },
+        ifInCart () {
+            this.$axios.get(
+                '/classes/cart',
+                {params: {
+                    where: {
+                        'goods_id': this.goods.goods_id,
+                        'username': localStorage.getItem('username')
+                    }
+                }}
+            )
+            .then(res => {
+                this.cartInfo = res.results[0]
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        addCart () {
+            this.$axios.post(
+                '/classes/cart',
+                {
+                    goods_id: this.goods.goods_id,
+                    name: this.goods.name,
+                    url: this.goods.picture.url,
+                    price: this.goods.price,
+                    username: localStorage.getItem('username'),
+                    quantity: 1
+                }
+            )
+            .then(res => {
+                this.ifInCart()
+                Toast('已加入购物车~')
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        putCart () {
+            this.$axios.put(
+                `/classes/cart/${this.cartInfo.objectId}`,
+                {
+                    quantity: this.cartInfo.quantity + 1
+                }
+            )
+            .then(res => {
+                this.ifInCart()
+                Toast('已加入购物车~')
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        changeCart () {
+            if(this.$store.state.token){
+                if(this.cartInfo){
+                    this.putCart()
+                } else{
+                    this.addCart()
+                }    
+            } else {
+                this.$router.push('/user/login')
+            }
+        },
         sorry() {
-            Toast('暂无后续逻辑~');
+            Toast('暂无后续逻辑~')
         }
     },
     created () {
@@ -87,40 +159,35 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.goods {
-  padding-bottom: 50px;
-
-  &-swipe {
-    img {
-      width: 100%;
-      display: block;
+.detail {
+    padding-bottom: 50px;
+    .goback{
+        color: white;
     }
-  }
-
-  &-title {
-    font-size: 16px;
-  }
-
-  &-price {
-    color: #f44;
-  }
-
-  &-express {
-    color: #999;
-    font-size: 12px;
-    padding: 5px 15px;
-  }
-
-  &-cell-group {
-    margin: 15px 0;
-
-    .van-cell__value {
-      color: #999;
+    .van-image {
+        width: 100vw;
+        height: 60vw;
     }
-  }
+    .goods-title {
+        font-size: 16px;
+    }
+    .goods-price {
+        color: #f44;
+    }
+    .goods-express {
+        color: #999;
+        font-size: 12px;
+        padding: 5px 15px;
+    }
+    .goods-cell-group {
+        margin: 15px 0;
 
-  &-tag {
-    margin-left: 5px;
-  }
+        .van-cell__value {
+        color: #999;
+        }
+    }
+    .goods-tag {
+        margin-left: 5px;
+    }
 }
 </style>

@@ -23,24 +23,37 @@
     <van-cell-group>
         <van-cell icon="records" title="全部订单" is-link />
         <van-cell icon="points" title="个人设置" is-link />
+        <van-cell icon="close" title="登出当前账户" @click="logout" is-link />
     </van-cell-group>
   </div>
 </template>
 
 <script>
-import { Row, Col, Cell, CellGroup } from 'vant';
+import { Row, Col, Cell, CellGroup, Dialog } from 'vant';
 
 export default {
-  components: {
-    [Row.name]: Row,
-    [Col.name]: Col,
-    [Cell.name]: Cell,
-    [CellGroup.name]: CellGroup
-  }
+    components: {
+        [Row.name]: Row,
+        [Col.name]: Col,
+        [Cell.name]: Cell,
+        [CellGroup.name]: CellGroup
+    },
+    methods: {
+        logout(){
+            localStorage.removeItem('token')
+            localStorage.removeItem('username')
+            this.$store.commit('setToken', null)
+            Dialog({
+                message: '登出成功'
+            }).then(() => {
+                this.$router.push('/index')
+            })
+        }
+    }
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .user {
     &-poster {
         width: 100%;
@@ -52,14 +65,15 @@ export default {
         background-size: cover;
     }
     &-info {
-        width: 100px;
-        height: 100px;
         text-align: center;
         img{
-            width: 100%;
-            height: 100%;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             margin-bottom: 5px;
+        }
+        p{
+            font-size: 14px;
         }
     }
     &-group {
