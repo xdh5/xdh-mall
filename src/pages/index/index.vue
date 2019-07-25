@@ -63,9 +63,9 @@ export default {
         return {
             loading: false,
             totalData: [],
-            currentData: [undefined],
+            currentData: [undefined], // 保证初始值不为空，触发无限滚动
             page: 1,
-            forbidInfinite: false, //禁止无限滚动
+            forbidInfinite: false, // 禁止无限滚动
         }
     },
     methods: {
@@ -91,7 +91,6 @@ export default {
                 this.loading = false
             })
             .catch(err=>{
-                console.log(err)
                 this.loading = false
             })
         }

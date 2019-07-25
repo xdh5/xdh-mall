@@ -2,34 +2,34 @@
   <div class="user-wrapper">
     <div class="user-poster">
         <div class="user-info">
-            <img src="@/assets/images/下载.jpg">
-            <p>咸蛋黄</p>
+            <img src="@/assets/images/avatar.jpg">
+            <p>{{username}}</p>
         </div>
     </div>
     <van-row class="user-links">
       <van-col span="8">
-        <van-icon name="pending-payment" />
+        <van-icon name="pending-payment" @click="sorry"/>
         待付款
       </van-col>
       <van-col span="8">
-        <van-icon name="records" />
+        <van-icon name="records" @click="sorry"/>
         待发货
       </van-col>
       <van-col span="8">
-        <van-icon name="logistics" />
+        <van-icon name="logistics" @click="sorry"/>
         已发货
       </van-col>
     </van-row>
     <van-cell-group>
-        <van-cell icon="records" title="全部订单" is-link />
-        <van-cell icon="points" title="个人设置" is-link />
+        <van-cell icon="records" title="全部订单" is-link @click="sorry"/>
+        <van-cell icon="points" title="个人设置" is-link @click="sorry"/>
         <van-cell icon="close" title="登出当前账户" @click="logout" is-link />
     </van-cell-group>
   </div>
 </template>
 
 <script>
-import { Row, Col, Cell, CellGroup, Dialog } from 'vant';
+import { Row, Col, Cell, CellGroup, Dialog, Toast } from 'vant';
 
 export default {
     components: {
@@ -38,16 +38,25 @@ export default {
         [Cell.name]: Cell,
         [CellGroup.name]: CellGroup
     },
+    data () {
+        return {
+            username: this.$store.state.username
+        }
+    },
     methods: {
         logout(){
             localStorage.removeItem('token')
             localStorage.removeItem('username')
-            this.$store.commit('setToken', null)
+            this.$store.commit('setState', {key: 'token', value: null})
+            this.$store.commit('setState', {key: 'username', value: null})
             Dialog({
                 message: '登出成功'
             }).then(() => {
                 this.$router.push('/index')
             })
+        },
+        sorry () {
+            Toast('暂无后续逻辑~')
         }
     }
 };
@@ -73,7 +82,8 @@ export default {
             margin-bottom: 5px;
         }
         p{
-            font-size: 14px;
+            font-size: 20px;
+            margin-top: 10px;
         }
     }
     &-group {

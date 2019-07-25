@@ -19,8 +19,19 @@
             <van-card
             :title="value.name"
             :price="value.price"
-            :thumb="value.url"
             :num="value.quantity">
+            <template slot="thumb">
+                <router-link :to="{name: 'detail', params: {id:value.good_id}}">
+                <van-image
+                lazy-load
+                fit="cover"
+                :src="value.url"
+                >
+                    <template v-slot:loading>加载中</template>
+                    <template v-slot:error>加载失败</template>
+                </van-image>
+                </router-link>
+            </template>
             <template slot="num">
                 <van-stepper v-model="value.quantity" prop="value" @change="changeQuantity(value, $event)"/>
             </template>
@@ -41,7 +52,7 @@
 </template>
 
 <script>
-import { Card, Checkbox, CheckboxGroup, SubmitBar, Stepper, SwipeCell, Button } from 'vant';
+import { Card, Checkbox, CheckboxGroup, SubmitBar, Stepper, SwipeCell, Button, Toast } from 'vant';
 import GoBack from '@/components/GoBack'
 
 export default {
@@ -81,14 +92,13 @@ export default {
             this.$axios.get(
                 '/classes/cart',
                 {params: {
-                    where: {'username': localStorage.getItem('username')}
+                    where: {'username': this.$store.state.username}
                 }}
             )
             .then(res => {
                 this.goods = res.results
             })
             .catch(err=>{
-                console.log(err)
             })
         },
         changeQuantity(value, quantity){
@@ -101,7 +111,6 @@ export default {
             .then(res => {
             })
             .catch(err=>{
-                console.log(err)
             })
         },
         deleteGood (value) {
@@ -112,13 +121,13 @@ export default {
                 this.getList()
             })
             .catch(err=>{
-                console.log(err)
             })
         },
         allChecked(){
             this.checkedGoods = this.goods.length === this.checkedGoods.length ? [] : this.goods
         },
         onSubmit() {
+            Toast('暂无后续逻辑~')
         }
     },
     created () {
@@ -189,8 +198,12 @@ header{
         }
     }
     /deep/.van-card__thumb{
-        img{
-            object-fit:cover!important
+        .van-image{
+            height: 75px;
+            width: 75px;
+            img{
+                object-fit:cover!important
+            }
         }
     }
 }

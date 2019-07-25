@@ -24,11 +24,15 @@
         <van-button type="default" @click="login">登录</van-button>
         <van-button type="info" @click="register">注册</van-button>
     </div>
+    <div class="tip">
+        <p>如果用户名不存在，将自动注册。</p>
+    </div>
   </div>
 </template>
 
 <script>
 import { CellGroup, Field, Button, Dialog } from 'vant';
+import AsyncValidator from 'async-validator'
 
 export default {
     components: {
@@ -43,6 +47,12 @@ export default {
         }
     },
     methods: {
+        savaUser (res) {
+            localStorage.setItem('token', res.sessionToken)
+            localStorage.setItem('username', res.username)
+            this.$store.commit('setState', {key: 'token', value: res.sessionToken})
+            this.$store.commit('setState', {key: 'username', value: res.username})
+        },
         login () {
             this.$axios.get(
                 '/login',
@@ -52,23 +62,75 @@ export default {
                 }}
             )
             .then(res => {
-                localStorage.setItem("token", res.sessionToken)
-                localStorage.setItem("username", res.username)
-                this.$store.commit('setToken', res.sessionToken)
+                this.savaUser(res)
                 Dialog({
                     message: '登录成功'
                 }).then(() => {
                     this.$router.push('/index')
                 })
             })
-            .catch(err=>{
-                Dialog({
-                    message: '登录失败'
-                })
+            .catch(err => {
+                switch (err.code) {
+                    case 210:
+                        Dialog({
+                            message: '用户名和密码不匹配'
+                        })                
+                        break
+                    case 211:
+                        Dialog.confirm({
+                            message: '用户名不存在，是否自动注册？'
+                        }).then(() => {
+                            this.register()
+                        })
+                        break
+                    default:
+                        Dialog({
+                            message: '登录失败。'
+                        }) 
+                        break
+                }
             })
         },
         register () {
-            this.$router.push('/user/register')
+            this.$axios.post(
+                '/users',
+                {
+                    'username': this.username,
+                    'password': this.password,
+                }
+            )
+            .then(res => {
+                this.savaUser(res)
+                Dialog({
+                    message: '注册成功'
+                }).then(() => {
+                    this.$router.push('/index')
+                })
+            })
+            .catch(err => {
+                switch (err.code) {
+                    case 217:
+                        Dialog({
+                            message: '注册失败，请输入用户名。'
+                        })
+                        break;
+                    case 218:
+                        Dialog({
+                            message: '注册失败，请输入密码。'
+                        })
+                        break;
+                    case 202:
+                        Dialog({
+                            message: '注册失败，用户名已存在。'
+                        })
+                        break;
+                    default:
+                        Dialog({
+                            message: '注册失败。'
+                        })
+                        break;
+                }
+            })
         }
     }
 };
@@ -100,8 +162,15 @@ export default {
 .van-cell-group {
     margin-top: 20px;
 }
+.tip{
+    color: red;
+    text-align: center;
+    p{
+        display: inline-block;
+    }
+}
 .button{
-    margin-top: 40px;
+    margin: 50px 0;
     text-align: center;
     .van-button{
         width: 100px;

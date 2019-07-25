@@ -5,16 +5,13 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        active: 'index',
+        active: sessionStorage.getItem('active') || 'active',
         token: localStorage.getItem('token'),
         username: localStorage.getItem('username')
     },
     mutations: {
-        changeTab(state, index) {
-            state.active = index
-        },
-        setToken(state, index) {
-            state.token = index
+        setState(state, params) {
+            state[params.key] = params.value
         }
     }
 })
