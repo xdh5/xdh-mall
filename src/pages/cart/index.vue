@@ -145,6 +145,10 @@ export default {
 header{
     padding: 10px;
     background: white;
+    position: fixed;
+    top:0;
+    z-index: 999;
+    width: 100%;
     .title{
         margin-left: 30px;
     }
@@ -168,6 +172,8 @@ header{
 }
  /deep/ .card-goods{
     background-color: #fff;
+    margin-top:65px;
+    margin-bottom: 50px;
     &__item{
         position: relative;
         background-color: #fafafa;
@@ -206,6 +212,9 @@ header{
             }
         }
     }
+}
+.van-submit-bar{
+    bottom:50px;
 }
 .all-checked{
     margin-left: 10px;

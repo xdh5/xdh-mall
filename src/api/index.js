@@ -17,7 +17,7 @@ axios.interceptors.response.use(
         return res.data
     },
     (err) => {
-        return Promise.reject(err.response.data)
+        return Promise.reject(err.response? err.response.data : err)
     }
 )
 

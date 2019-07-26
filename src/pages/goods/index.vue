@@ -68,6 +68,8 @@ export default {
             currentData: [undefined],
             page: 1,
             
+            source: null, // 防止频繁切换tab重复请求，存放取消的请求方法
+            
             keyWord: ''
         }
     },
@@ -82,14 +84,20 @@ export default {
         getList () {
             this.loading = true;
             this.forbidInfinite = true
+            const _this = this;
             this.$axios.get(
                 '/classes/Goods',
-                {params: {
-                    keys: 'name,picture',
-                    limit: 4,
-                    skip: (this.page-1)*4,
-                    where: {'type': this.activeKey ===0 ?{"$in":[1,2,3,4]} : this.activeKey}
-                }}
+                {
+                    params: {
+                        keys: 'name,picture',
+                        limit: 4,
+                        skip: (this.page-1)*4,
+                        where: {'type': this.activeKey ===0 ?{"$in":[1,2,3,4]} : this.activeKey}
+                    },
+                    cancelToken: new this.$axios.CancelToken(function executor(c) {
+                        _this.source = c;
+                    })
+                }
             )
             .then(res => {
                 this.currentData = res.results
@@ -100,11 +108,18 @@ export default {
                 }
                 this.loading = false
             })
-            .catch(err=>{
-                this.loading = false
+            .catch(function(thrown) {
+                _this.loading = false
+                // if (axios.isCancel(thrown)) {
+                // } else {
+                //     console.log(thrown)
+                // }
             })
         },
         changeSide () {
+            if(typeof this.source ==='function'){
+                this.source('cancel')   //取消请求
+            }
             this.initializeItem()
             this.getList()
         },

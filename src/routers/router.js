@@ -40,6 +40,7 @@ const routes = [
         path: '/cart',
         components: {
             main: () => import('@/pages/cart'),
+            footer
         },
         meta: {
             title: '蛋黄商城-购物车',
