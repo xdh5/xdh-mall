@@ -1,0 +1,14 @@
+.divider {
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 30px;
+    &::before,&::after {
+        content: '';
+        display: block;
+        height: 0.05em;
+        min-width: 30vw;
+        background: gray;
+    }
+}
